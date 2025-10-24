@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
 
-First, run the development server:
+## **ChainLinker — Verified Work & Skills on Solana**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> Web3-профили с реальными подтверждениями опыта и навыков через NFT.
+
+![ChainLinker Preview](https://placehold.co/1200x600/1a1a1a/ffffff?text=ChainLinker+-+Verified+Experience+on+Solana)
+
+---
+
+### **Submission to 2025 Solana Colosseum**
+
+**Команда:**
+
+* Кизиков Степан – [GitHub](https://github.com/bri1545)
+* Киреев Трофим – [GitHub](https://github.com/teammate2)
+* 
+
+---
+
+### **Resources**
+
+* Презентация проекта – [ссылка](https://example.com/presentation)
+* Видео о проекте – [ссылка](https://example.com/video)
+* Приложение (Solana Devnet) – [ссылка](https://example.com/app)
+* Сайт проекта – [ссылка](https://example.com)
+* Twitter / X проекта – [ссылка](https://x.com/chainlinker)
+* Репозиторий GitHub – [ссылка](https://github.com/bri1545/ChainLinker)
+* Сообщество (Telegram / Discord) – [ссылка](https://t.me/chainlinker)
+
+---
+
+## **Problem and Solution**
+
+### Проблема
+
+В классических профессиональных сетях вроде LinkedIn легко подделать стаж и навыки.
+Фальшивые сертификаты и резюме создают шум и мешают работодателям находить реальных специалистов.
+
+* Более 70% рекрутеров сталкивались с ложными данными в профилях.
+* Около 45% онлайн-сертификатов невозможно проверить.
+
+### Решение
+
+ChainLinker – это Web3-платформа на Solana, где каждый навык, сертификат или период работы подтверждается NFT.
+Организации могут выпускать подтверждённые NFT напрямую в кошелёк пользователя, а тот – проходить тесты и получать on-chain подтверждения.
+
+> «Данные о твоём опыте принадлежат тебе, и они должны храниться в твоём кошельке, а не на серверах компаний.»
+
+---
+
+## **Summary of Features**
+
+* NFT-сертификаты навыков и стажа
+* Оплата тестов токенами SOL (
+* Привязка Phantom Wallet (Solana Devnet)
+* Реальный mint NFT через Metaplex SDK
+* Проверка знаний через интерактивный тест
+* Тёмная матовая тема и плавные анимации
+* Полноценный рабочий прототип на Devnet
+
+---
+
+## **Tech Stack**
+
+| Компонент  | Технологии                                                       |
+| ---------- | ---------------------------------------------------------------- |
+| Frontend   | Next.js 14, React, TailwindCSS, Framer Motion                    |
+| Web3 SDK   | @solana/web3.js, @solana/wallet-adapter, @metaplex-foundation/js |
+| Blockchain | Solana Devnet                                                    |
+| Wallet     | Phantom, Solflare                                                |
+| Storage    | Bundlr / Arweave (для NFT метаданных)                            |
+
+---
+
+## **Architecture**
+
+```text
+[ Пользователь ]
+       |
+[ Next.js интерфейс (тест, NFT mint) ]
+       |
+[ Phantom Wallet Adapter ]
+       |
+[ Solana Devnet + Metaplex SDK ]
+       |
+[ Bundlr / Arweave (метаданные) ]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## **Quick Start**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Запуск локально
 
-## Learn More
+```bash
+git clone https://github.com/yourusername/chainlinker
+cd chainlinker
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Открыть: [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Без Node.js
 
-## Deploy on Vercel
+```bash
+npm run build
+npm run export
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Открыть файл `/out/index.html` в браузере
+или залить проект на Vercel / Netlify / StackBlitz.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+### Основные зависимости
+
+```bash
+npm install next react react-dom tailwindcss framer-motion \
+@solana/web3.js @solana/wallet-adapter-react \
+@solana/wallet-adapter-wallets @solana/wallet-adapter-react-ui \
+@metaplex-foundation/js qrcode.react
+```
+
+---
+
+## **Program Info**
+
+Развёрнутые программы на Solana Devnet:
+
+* PROGRAM: `EUziGjjJJGRYDdkzKDCLfWhTSSZ35QZBDVyLgQCsQDd4`
+  Обрабатывает транзакции и выпускает NFT.
+
+---
+
+## **Почему ChainLinker выделяется**
+
+* Проверка навыков и опыта через реальные транзакции
+* Использование Solana Devnet и Metaplex SDK
+* Реальный NFT-механизм mint в демонстрации
+* Живой интерфейс и работающий Phantom Wallet интегратор
+* Полностью оформленный Web3-профиль с on-chain подтверждениями
+
+---
+
+**ChainLinker – Verified Work. Real Skills. On-Chain.**
+
+---
+
