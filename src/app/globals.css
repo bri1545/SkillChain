@@ -1,2 +1,103 @@
-body{background:#141416;color:#e6e6e6;font-family:Inter,ui-sans-serif,system-ui;}
-/* Tailwind ������ ���� ��������, ������ ���� ���������� ����������� ����� */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === ГЛОБАЛЬНЫЙ СТИЛЬ ПРОЕКТА SKILLCHAIN === */
+html,
+body {
+  @apply bg-gray-900 text-white min-h-screen;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Сброс отступов и стилей */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === КРАСИВАЯ ПРОКРУТКА === */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #6b21a8; /* фиолетовый */
+  border-radius: 10px;
+}
+
+/* === СТАНДАРТНЫЕ КНОПКИ === */
+button {
+  @apply transition-all duration-300 font-semibold;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+/* === INPUT СТИЛИ === */
+input {
+  @apply bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 w-full;
+}
+
+input:focus {
+  @apply outline-none border-purple-500;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+/* === ЗАГОЛОВКИ === */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-white;
+}
+
+/* === АНИМАЦИИ === */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === КАРТОЧКИ, NFT и ПРОФИЛИ === */
+.card {
+  @apply bg-gray-800 p-6 rounded-2xl shadow-lg transition-all;
+}
+
+.card:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* === ССЫЛКИ === */
+a {
+  @apply text-purple-400 underline-offset-2 transition-all;
+}
+
+a:hover {
+  @apply text-purple-300;
+  text-decoration: underline;
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+}
