@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import Tests from "@/pages/tests";
 import TestTaking from "@/pages/test-taking";
 import Profile from "@/pages/profile";
+import SkillPool from "@/pages/skill-pool";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/tests" component={Tests} />
       <Route path="/test/:testId" component={TestTaking} />
       <Route path="/profile" component={Profile} />
+      <Route path="/skill-pool" component={SkillPool} />
       <Route component={NotFound} />
     </Switch>
   );
