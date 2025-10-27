@@ -4,6 +4,7 @@ import { Connection, clusterApiUrl, LAMPORTS_PER_SOL, PublicKey } from "@solana/
 import { storage } from "./storage";
 import { generateTestQuestions, generateCategories } from "./gemini";
 import { mintCertificateNFT } from "./metaplex";
+import { anchorClient } from "./anchor-client";
 import { randomUUID } from "crypto";
 import { 
   generateTestRequestSchema, 
@@ -111,6 +112,11 @@ async function verifyPaymentTransaction(
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for Docker
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
+
   // Get AI-generated categories
   app.post("/api/categories", async (req, res) => {
     try {
@@ -366,6 +372,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user stats:", error);
       res.status(500).json({ error: "Failed to fetch user stats" });
+    }
+  });
+
+  // On-chain profile endpoints
+  app.get("/api/onchain/profile/:walletAddress", async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      const onchainProfile = await anchorClient.getUserProfile(walletAddress);
+      const profileExists = await anchorClient.checkProfileExists(walletAddress);
+      
+      const profilePDA = anchorClient.getUserProfileAddress(walletAddress);
+      
+      res.json({
+        exists: profileExists,
+        pda: profilePDA,
+        profile: onchainProfile,
+        message: profileExists 
+          ? "On-chain profile found" 
+          : "No on-chain profile yet. Create one to enable DAO features.",
+      });
+    } catch (error) {
+      console.error("Error fetching on-chain profile:", error);
+      res.status(500).json({ error: "Failed to fetch on-chain profile" });
+    }
+  });
+
+  // Get skill registry info
+  app.get("/api/onchain/registry", async (req, res) => {
+    try {
+      const registry = await anchorClient.getSkillRegistry();
+      const registryPDA = anchorClient.getSkillRegistryAddress();
+      
+      res.json({
+        pda: registryPDA,
+        registry,
+        programId: 'SkiLLcHaiNPRoGraM11111111111111111111111111',
+      });
+    } catch (error) {
+      console.error("Error fetching skill registry:", error);
+      res.status(500).json({ error: "Failed to fetch skill registry" });
+    }
+  });
+
+  // Verify user skill (for dApp integrations)
+  app.post("/api/onchain/verify-skill", async (req, res) => {
+    try {
+      const { walletAddress, skillId, minScore } = req.body;
+      
+      if (!walletAddress || !skillId) {
+        return res.status(400).json({ 
+          error: "walletAddress and skillId are required" 
+        });
+      }
+
+      const profile = await anchorClient.getUserProfile(walletAddress);
+      
+      if (!profile) {
+        return res.json({
+          verified: false,
+          message: "User has no on-chain profile",
+        });
+      }
+
+      const skill = profile.skills.find(s => s.skillId === skillId);
+      
+      if (!skill) {
+        return res.json({
+          verified: false,
+          message: "User does not have this skill",
+        });
+      }
+
+      const meetsRequirement = minScore ? skill.score >= minScore : true;
+      
+      res.json({
+        verified: meetsRequirement,
+        skill: {
+          id: skill.skillId,
+          level: skill.level,
+          score: skill.score,
+          earnedAt: skill.earnedAt,
+          nftMint: skill.nftMint,
+        },
+        message: meetsRequirement 
+          ? "Skill verified successfully" 
+          : `Skill score ${skill.score} is below required ${minScore}`,
+      });
+    } catch (error) {
+      console.error("Error verifying skill:", error);
+      res.status(500).json({ error: "Failed to verify skill" });
+    }
+  });
+
+  // Get DAO statistics
+  app.get("/api/dao/stats", async (req, res) => {
+    try {
+      const registry = await anchorClient.getSkillRegistry();
+      
+      res.json({
+        totalValidators: registry?.totalValidators || 0,
+        totalCertificates: registry?.totalCertificates || 0,
+        totalUsers: registry?.totalUsers || 0,
+        rewardDistribution: {
+          senior: 15,
+          middle: 12,
+          junior: 10,
+        },
+        revenueStreams: {
+          failedTests: 45,
+          ads: 30,
+          partnerships: 15,
+          other: 10,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching DAO stats:", error);
+      res.status(500).json({ error: "Failed to fetch DAO stats" });
     }
   });
 

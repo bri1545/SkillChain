@@ -4,7 +4,7 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { useQuery } from '@tanstack/react-query';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Link, useLocation } from 'wouter';
-import { Award, User, Home, Trophy, Coins } from 'lucide-react';
+import { Award, User, Home, Trophy, Coins, Shield } from 'lucide-react';
 import { formatSolBalance } from '@/lib/solana';
 
 export function Header() {
@@ -67,6 +67,14 @@ export function Header() {
                   }`} data-testid="link-nav-skillpool">
                     <Coins className="h-4 w-4" />
                     SkillPool
+                  </button>
+                </Link>
+                <Link href="/dao">
+                  <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-elevate ${
+                    location === '/dao' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                  }`} data-testid="link-nav-dao">
+                    <Shield className="h-4 w-4" />
+                    DAO
                   </button>
                 </Link>
               </nav>

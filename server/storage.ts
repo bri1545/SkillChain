@@ -12,6 +12,8 @@ export interface IStorage {
   
   getUserStats(walletAddress: string): Promise<UserStats>;
   updateUserStats(walletAddress: string, stats: Partial<UserStats>): Promise<void>;
+  getUserCertificates(walletAddress: string): Promise<Certificate[]>;
+  getAllUserStats(): Promise<UserStats[]>;
   
   isPaymentSignatureUsed(signature: string): Promise<boolean>;
   markPaymentSignatureUsed(signature: string, walletAddress: string, amount: number): Promise<void>;
@@ -240,6 +242,74 @@ export class PostgresStorage implements IStorage {
     } catch (error) {
       console.error("Error marking payment signature as used:", error);
       // Log but don't throw - the payment was verified on-chain, so it's safe to proceed
+    }
+  }
+
+  async getUserCertificates(walletAddress: string): Promise<Certificate[]> {
+    try {
+      const certs = await db.select()
+        .from(certificates)
+        .where(eq(certificates.walletAddress, walletAddress));
+      
+      if (!certs || !Array.isArray(certs)) {
+        return [];
+      }
+      
+      return certs.map(cert => {
+        let earnedAtString: string;
+        if (cert.earnedAt && cert.earnedAt instanceof Date && !isNaN(cert.earnedAt.getTime())) {
+          earnedAtString = cert.earnedAt.toISOString();
+        } else if (cert.earnedAt) {
+          try {
+            const date = new Date(cert.earnedAt);
+            earnedAtString = !isNaN(date.getTime()) ? date.toISOString() : new Date().toISOString();
+          } catch {
+            earnedAtString = new Date().toISOString();
+          }
+        } else {
+          earnedAtString = new Date().toISOString();
+        }
+        
+        return {
+          id: cert.id,
+          walletAddress: cert.walletAddress,
+          topic: cert.topic,
+          level: cert.level as "Junior" | "Middle" | "Senior",
+          score: cert.score,
+          nftMint: cert.nftMint || undefined,
+          nftMetadataUri: cert.nftMetadataUri || undefined,
+          earnedAt: earnedAtString,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching user certificates:", error);
+      return [];
+    }
+  }
+
+  async getAllUserStats(): Promise<UserStats[]> {
+    try {
+      const allStats = await db.select().from(userStats);
+      
+      if (!allStats || !Array.isArray(allStats)) {
+        return [];
+      }
+      
+      return Promise.all(allStats.map(async (stat) => {
+        const certs = await this.getUserCertificates(stat.walletAddress);
+        
+        return {
+          walletAddress: stat.walletAddress,
+          totalTests: stat.totalTests,
+          totalCertificates: stat.totalCertificates,
+          successRate: stat.successRate,
+          totalSolEarned: stat.totalSolEarned / 1000,
+          certificates: certs,
+        };
+      }));
+    } catch (error) {
+      console.error("Error fetching all user stats:", error);
+      return [];
     }
   }
 }

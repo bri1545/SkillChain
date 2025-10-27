@@ -3,6 +3,69 @@
 ## Overview
 SkillChain is a Web3 application on the Solana blockchain that offers verifiable NFT certificates for skill assessment. Users pay 0.15 SOL to generate AI-powered tests, take them, and receive an NFT certificate (Junior/Middle/Senior level) stored via Metaplex. The platform rewards users based on performance, blending educational testing with blockchain for immutable proof of skills. It aims for a user experience inspired by modern Web3 and educational platforms.
 
+## Recent Changes (October 27, 2025)
+
+### On-Chain Reputation System & DAO Implementation
+**Architectural proof-of-concept for blockchain-native skill verification:**
+
+1. **Anchor Smart Contract Program** - Full Solana program implementation
+   - **SkillRegistry** - Global registry for validators, certificates, and users
+   - **UserProfile (PDA)** - On-chain user profiles with skill scores and achievements
+   - **Validator System** - DAO validators who approve and sign test results
+   - **EscrowAccount** - Smart contract-based payment distribution (DAO 50%, Project 40%, Reward Pool 10%)
+   - **SKILL Token** - Utility token for Skill-to-Earn economy
+   - **Files:** `programs/skillchain/src/` - Complete Anchor program with instructions and state management
+
+2. **On-Chain Verification API** - Backend integration with Anchor program
+   - `/api/onchain/profile/:walletAddress` - Fetch user's on-chain profile and PDA
+   - `/api/onchain/registry` - Get skill registry and program information
+   - `/api/onchain/verify-skill` - Verify user skills for dApp integrations
+   - `/api/dao/stats` - DAO statistics and metrics
+   - **Files:** `server/anchor-client.ts`, `server/routes.ts`
+
+3. **DAO Frontend Page** - Complete governance interface
+   - On-chain profile display with PDA addresses
+   - Real-time DAO statistics (validators, certificates, users)
+   - Skill verification interface
+   - Reward distribution visualization
+   - Revenue streams breakdown
+   - **Files:** `client/src/pages/dao.tsx`, integrated in header navigation
+
+4. **TypeScript SDK** - Client-side Anchor program integration
+   - PDA derivation for user profiles, registry, validators
+   - On-chain data fetching and parsing
+   - Skill verification utilities
+   - **Files:** `client/src/lib/anchor/skillchain-client.ts`
+
+5. **Current Implementation Status:**
+   - **Anchor Smart Contract:** Fully implemented in Rust, not yet compiled/deployed
+   - **API Layer:** Functional using PostgreSQL database simulation
+   - **Frontend:** DAO page displays simulated data from database
+   - **Production Status:** Architectural proof-of-concept, requires deployment and deserialization implementation
+
+6. **What Works Now (Database Simulation):**
+   - `/api/onchain/profile/:walletAddress` - Returns user profile data from PostgreSQL
+   - `/api/onchain/registry` - Returns platform statistics from PostgreSQL  
+   - `/api/onchain/verify-skill` - Skill verification API for dApp integrations
+   - `/api/dao/stats` - DAO statistics
+   - DAO frontend page with full UI
+
+7. **Required for Production (True On-Chain):**
+   - Compile Anchor program with Rust toolchain (`anchor build`)
+   - Deploy program to Solana devnet (`anchor deploy`)
+   - Generate IDL and TypeScript types
+   - Implement Anchor account deserialization using IDL
+   - Update API layer to decode real on-chain PDA data
+   - Integration testing with deployed program
+   - See `ANCHOR_DEPLOYMENT.md` for complete deployment guide
+
+8. **Value of Current Implementation:**
+   - Complete Anchor program architecture (ready for compilation)
+   - Working API layer and frontend (demonstrates UX)
+   - Clear migration path from database to on-chain
+   - Foundation for decentralized reputation system
+   - Enables external dApp integrations via API
+
 ## Recent Changes (October 26, 2025)
 
 ### Real NFT Minting Enabled
@@ -46,7 +109,7 @@ Preferred communication style: Simple, everyday language.
 The frontend uses React 18 with TypeScript, Vite for bundling, and Wouter for routing. UI is built with `shadcn/ui` (New York style) using Radix UI primitives and Tailwind CSS for styling, supporting light/dark mode. State management relies on TanStack Query for server state and local React state for UI. Solana integration uses `@solana/wallet-adapter-react` and `@solana/web3.js` for Devnet interactions. Key design patterns include component composition, custom hooks, and path aliases.
 
 ### Backend Architecture
-The backend is built with Node.js and Express.js, entirely in TypeScript. It provides RESTful API endpoints, utilizing Zod schemas (`shared/schema.ts`) for shared request/response validation. Payment verification occurs via on-chain transaction validation, and replay attacks are prevented using signature tracking. AI integration uses Google Gemini (gemini-2.5-flash) for generating structured JSON test questions. NFT features include Metaplex SDK integration for minting certificates with enhanced metadata, serving as immutable proof of skill.
+The backend is built with Node.js and Express.js, entirely in TypeScript. It provides RESTful API endpoints, utilizing Zod schemas (`shared/schema.ts`) for shared request/response validation. Payment verification occurs via on-chain transaction validation, and replay attacks are prevented using signature tracking. AI integration uses Google Gemini (gemini-2.5-flash) for generating structured JSON test questions. NFT features include Metaplex SDK integration for minting certificates with enhanced metadata. **New:** Anchor program integration for on-chain reputation system, skill verification API for dApp integrations, and DAO statistics endpoints.
 
 ### Data Storage
 The application uses PostgreSQL with Drizzle ORM for persistent storage. The database schema defines tables for tests, test results, certificates, and user statistics. Payment signatures are tracked to prevent replay attacks. Data models include `Test`, `Question`, `TestResult`, `Certificate`, and `UserStats`.
@@ -55,6 +118,9 @@ The application uses PostgreSQL with Drizzle ORM for persistent storage. The dat
 - **AI-Powered Test Generation:** Dynamic, multi-level category selection (10 main, 15 sub, 20 specific skills) for test generation using Gemini AI. Tests consist of 10 questions, each worth 10 points (total 100).
 - **Scoring and Rewards:** A new scoring system awards Senior (90-100 pts, 15% SOL reward), Middle (80-89 pts, 12% SOL reward), and Junior (70-79 pts, 10% SOL reward) levels. Scores below 70 fail.
 - **Real NFT Certificate Minting:** NFTs are minted on Solana Devnet blockchain using Metaplex SDK with real keypair. Enhanced metadata with 10 attributes and dynamic image generation using DiceBear API. NFTs appear in users' Phantom wallets.
+- **On-Chain Reputation System (Architecture):** Anchor program implementation with UserProfile PDAs, SkillRegistry, Validator system, and on-chain skill scores. Currently uses database simulation, ready for on-chain deployment.
+- **SkillDAO Governance (Architecture):** Validator-based approval system, escrow payment distribution (DAO 50%, Project 40%, Rewards 10%), and SKILL token foundation for Skill-to-Earn economy. Smart contract implemented, requires deployment.
+- **dApp Integration API:** RESTful endpoints for external applications to verify user skills, enabling use cases like "Developer DAO - Rust experts only" or job platforms requiring verified skills. Currently simulated via database, will transition to on-chain data post-deployment.
 - **SkillPool Dashboard:** Prototype page showing platform economics - revenue streams (failed tests, ads, partnerships) and reward distribution mechanisms. Currently displays demo data.
 - **Payment Verification:** On-chain payment verification using Solana transactions ensures secure test generation and prevents backend exploitation.
 - **Robust Error Handling:** Comprehensive date validation and retry logic for fetching tests from the database.
@@ -73,7 +139,9 @@ The application uses PostgreSQL with Drizzle ORM for persistent storage. The dat
 - **Neon Database:** Serverless driver for PostgreSQL.
 
 ### Third-Party Libraries
+- **@coral-xyz/anchor:** Framework for Solana program development and client integration
 - **@solana/wallet-adapter-react, @solana/wallet-adapter-phantom, @solana/web3.js:** For Solana wallet integration and blockchain interactions.
+- **@solana/spl-token:** For SPL token operations (SKILL token)
 - **Radix UI primitives:** For accessible UI components.
 - **bs58:** For Base58 encoding/decoding.
 - **nanoid:** For generating unique IDs.

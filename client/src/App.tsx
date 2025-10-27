@@ -10,6 +10,7 @@ import Tests from "@/pages/tests";
 import TestTaking from "@/pages/test-taking";
 import Profile from "@/pages/profile";
 import SkillPool from "@/pages/skill-pool";
+import DAO from "@/pages/dao";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/test/:testId" component={TestTaking} />
       <Route path="/profile" component={Profile} />
       <Route path="/skill-pool" component={SkillPool} />
+      <Route path="/dao" component={DAO} />
       <Route component={NotFound} />
     </Switch>
   );
