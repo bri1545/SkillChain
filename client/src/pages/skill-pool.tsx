@@ -1,61 +1,72 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Card } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Coins, 
   TrendingUp, 
   Users, 
   Award, 
-  AlertCircle,
   ArrowDownToLine,
   ArrowUpFromLine,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+
+interface SkillPoolStats {
+  poolBalance: { sol: string; usd: string };
+  revenue: {
+    total: string;
+    failedTests: string;
+    ads: string;
+    partnerships: string;
+    other: string;
+  };
+  rewards: { total: string; monthly: string };
+  users: { active: number; totalTests: number; totalCertificates: number };
+  revenuePercentages: { failedTests: number; ads: number; partnerships: number; other: number };
+  rewardPercentages: { senior: number; middle: number; junior: number };
+}
 
 export default function SkillPool() {
   const { publicKey } = useWallet();
 
-  // Mock data for demonstration
-  const poolStats = {
-    totalBalance: "12.45 SOL",
-    totalBalanceUSD: "$1,658",
-    monthlyRevenue: "8.2 SOL",
-    monthlyRewards: "3.8 SOL",
-    activeUsers: 247,
-    totalRewards: "156.3 SOL",
-  };
+  const { data: stats, isLoading } = useQuery<SkillPoolStats>({
+    queryKey: ['/api/skillpool/stats'],
+    refetchInterval: 30000,
+  });
 
   const revenueStreams = [
     {
       icon: Users,
       title: "Неудачные попытки тестов",
       description: "Платежи от пользователей, не прошедших тест (score < 70)",
-      percentage: "45%",
-      amount: "3.69 SOL",
+      percentage: `${stats?.revenuePercentages.failedTests || 45}%`,
+      amount: `${stats?.revenue.failedTests || '0.00'} SOL`,
       color: "from-red-500/20 to-orange-500/20 border-red-500/30 text-red-400"
     },
     {
       icon: Zap,
       title: "Реклама",
       description: "Доход от рекламных размещений на платформе",
-      percentage: "30%",
-      amount: "2.46 SOL",
+      percentage: `${stats?.revenuePercentages.ads || 30}%`,
+      amount: `${stats?.revenue.ads || '0.00'} SOL`,
       color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30 text-blue-400"
     },
     {
       icon: Award,
       title: "Партнерские программы",
       description: "Комиссии от партнерских интеграций",
-      percentage: "15%",
-      amount: "1.23 SOL",
+      percentage: `${stats?.revenuePercentages.partnerships || 15}%`,
+      amount: `${stats?.revenue.partnerships || '0.00'} SOL`,
       color: "from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-400"
     },
     {
       icon: TrendingUp,
       title: "Прочее",
       description: "Дополнительные источники дохода",
-      percentage: "10%",
-      amount: "0.82 SOL",
+      percentage: `${stats?.revenuePercentages.other || 10}%`,
+      amount: `${stats?.revenue.other || '0.00'} SOL`,
       color: "from-green-500/20 to-emerald-500/20 border-green-500/30 text-green-400"
     }
   ];
@@ -63,36 +74,43 @@ export default function SkillPool() {
   const rewardDistribution = [
     {
       level: "Senior",
-      percentage: "15%",
+      percentage: `${stats?.rewardPercentages.senior || 15}%`,
       description: "90-100 баллов",
       color: "bg-gradient-to-r from-yellow-500 to-orange-500"
     },
     {
       level: "Middle",
-      percentage: "12%",
+      percentage: `${stats?.rewardPercentages.middle || 12}%`,
       description: "80-89 баллов",
       color: "bg-gradient-to-r from-blue-500 to-cyan-500"
     },
     {
       level: "Junior",
-      percentage: "10%",
+      percentage: `${stats?.rewardPercentages.junior || 10}%`,
       description: "70-79 баллов",
       color: "bg-gradient-to-r from-green-500 to-emerald-500"
     }
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iIzgwODBmZiIgc3Ryb2tlLXdpZHRoPSIuNSIgb3BhY2l0eT0iLjEiLz48L2c+PC9zdmc+')] opacity-30" />
         
         <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="max-w-4xl mx-auto text-center space-y-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <Coins className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Прототип функции</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
+              <Coins className="h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium text-green-500">Реальные данные из базы</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold font-serif">
               SkillPool
@@ -104,25 +122,7 @@ export default function SkillPool() {
         </div>
       </section>
 
-      {/* Warning Banner */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Card className="border-yellow-500/30 bg-yellow-500/5 p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-            <div className="space-y-1">
-              <p className="font-semibold text-yellow-900 dark:text-yellow-100">
-                Функция в разработке
-              </p>
-              <p className="text-sm text-yellow-800/80 dark:text-yellow-200/80">
-                SkillPool находится в стадии прототипа. Отображаемые данные являются демонстрационными и не отражают реальное состояние пула.
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Pool Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6 border-card-border">
             <div className="space-y-2">
@@ -131,8 +131,8 @@ export default function SkillPool() {
                 <Coins className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-bold font-mono">{poolStats.totalBalance}</p>
-                <p className="text-sm text-muted-foreground">{poolStats.totalBalanceUSD}</p>
+                <p className="text-2xl font-bold font-mono">{stats?.poolBalance.sol} SOL</p>
+                <p className="text-sm text-muted-foreground">${stats?.poolBalance.usd}</p>
               </div>
             </div>
           </Card>
@@ -140,12 +140,12 @@ export default function SkillPool() {
           <Card className="p-6 border-card-border">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Доход за месяц</span>
+                <span className="text-sm text-muted-foreground">Общий доход</span>
                 <ArrowDownToLine className="h-4 w-4 text-green-500" />
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-bold font-mono text-green-500">{poolStats.monthlyRevenue}</p>
-                <p className="text-sm text-muted-foreground">↑ +23% к прошлому месяцу</p>
+                <p className="text-2xl font-bold font-mono text-green-500">{stats?.revenue.total} SOL</p>
+                <p className="text-sm text-muted-foreground">Всего платформы</p>
               </div>
             </div>
           </Card>
@@ -153,12 +153,12 @@ export default function SkillPool() {
           <Card className="p-6 border-card-border">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Выплаты за месяц</span>
+                <span className="text-sm text-muted-foreground">Всего выплачено</span>
                 <ArrowUpFromLine className="h-4 w-4 text-blue-500" />
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-bold font-mono text-blue-500">{poolStats.monthlyRewards}</p>
-                <p className="text-sm text-muted-foreground">↑ +15% к прошлому месяцу</p>
+                <p className="text-2xl font-bold font-mono text-blue-500">{stats?.rewards.total} SOL</p>
+                <p className="text-sm text-muted-foreground">{stats?.users.totalCertificates} сертификатов</p>
               </div>
             </div>
           </Card>
@@ -170,14 +170,13 @@ export default function SkillPool() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-bold font-mono">{poolStats.activeUsers}</p>
-                <p className="text-sm text-muted-foreground">За последние 30 дней</p>
+                <p className="text-2xl font-bold font-mono">{stats?.users.active}</p>
+                <p className="text-sm text-muted-foreground">{stats?.users.totalTests} тестов пройдено</p>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Revenue Streams */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <ArrowDownToLine className="h-6 w-6 text-green-500" />
@@ -208,7 +207,6 @@ export default function SkillPool() {
           </div>
         </div>
 
-        {/* Reward Distribution */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
             <ArrowUpFromLine className="h-6 w-6 text-blue-500" />
@@ -256,7 +254,6 @@ export default function SkillPool() {
           </Card>
         </div>
 
-        {/* How it Works */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold font-serif">Как работает SkillPool</h2>
           

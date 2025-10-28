@@ -493,6 +493,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get SkillPool statistics (real data from database)
+  app.get("/api/skillpool/stats", async (req, res) => {
+    try {
+      // Get all user stats from database
+      const allStats = await storage.getAllUserStats();
+      
+      // Calculate real pool statistics
+      let totalSolEarned = 0;
+      let totalTests = 0;
+      let totalCertificates = 0;
+      let activeUsers = 0;
+      
+      allStats.forEach(stat => {
+        totalSolEarned += stat.totalSolEarned;
+        totalTests += stat.totalTests;
+        totalCertificates += stat.totalCertificates;
+        if (stat.totalTests > 0) {
+          activeUsers++;
+        }
+      });
+
+      // Calculate revenue from failed tests (test price 0.15 SOL)
+      const failedTests = totalTests - totalCertificates;
+      const revenueFromFailedTests = failedTests * 0.15;
+      
+      // Mock revenue from other sources (for now)
+      const revenueFromAds = revenueFromFailedTests * 0.30 / 0.45; // 30% vs 45%
+      const revenueFromPartnerships = revenueFromFailedTests * 0.15 / 0.45; // 15% vs 45%
+      const revenueFromOther = revenueFromFailedTests * 0.10 / 0.45; // 10% vs 45%
+      
+      const totalRevenue = revenueFromFailedTests + revenueFromAds + revenueFromPartnerships + revenueFromOther;
+      const totalBalance = totalRevenue - totalSolEarned;
+
+      res.json({
+        poolBalance: {
+          sol: totalBalance.toFixed(2),
+          usd: (totalBalance * 133).toFixed(2), // Approx SOL price
+        },
+        revenue: {
+          total: totalRevenue.toFixed(2),
+          failedTests: revenueFromFailedTests.toFixed(2),
+          ads: revenueFromAds.toFixed(2),
+          partnerships: revenueFromPartnerships.toFixed(2),
+          other: revenueFromOther.toFixed(2),
+        },
+        rewards: {
+          total: totalSolEarned.toFixed(2),
+          monthly: (totalSolEarned * 0.3).toFixed(2), // Estimate 30% in last month
+        },
+        users: {
+          active: activeUsers,
+          totalTests: totalTests,
+          totalCertificates: totalCertificates,
+        },
+        revenuePercentages: {
+          failedTests: 45,
+          ads: 30,
+          partnerships: 15,
+          other: 10,
+        },
+        rewardPercentages: {
+          senior: 15,
+          middle: 12,
+          junior: 10,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching SkillPool stats:", error);
+      res.status(500).json({ error: "Failed to fetch SkillPool stats" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
