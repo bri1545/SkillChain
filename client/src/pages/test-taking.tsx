@@ -48,6 +48,10 @@ export default function TestTaking() {
       setTestResult(result);
       setShowResult(true);
     },
+    onError: (error) => {
+      console.error('Test submission error:', error);
+      alert('An error occurred while submitting your test. Please try again or check your profile to see if the certificate was created.');
+    },
   });
 
   const handleAnswerSelect = (answerIndex: number) => {

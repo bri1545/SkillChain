@@ -146,7 +146,7 @@ export default function Profile() {
                       </h3>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Score</span>
-                        <span className="font-bold" data-testid={`text-cert-score-${index}`}>{cert.score}/5</span>
+                        <span className="font-bold" data-testid={`text-cert-score-${index}`}>{cert.score}/100</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Earned</span>
@@ -156,9 +156,15 @@ export default function Profile() {
                       </div>
                       {cert.nftMint && (
                         <div className="pt-2 border-t border-border">
-                          <p className="text-xs text-muted-foreground font-mono truncate">
-                            NFT: {cert.nftMint.slice(0, 8)}...{cert.nftMint.slice(-8)}
-                          </p>
+                          <a 
+                            href={`https://explorer.solana.com/address/${cert.nftMint}?cluster=devnet`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:text-primary/80 font-mono truncate block transition-colors"
+                            title="View NFT on Solana Explorer"
+                          >
+                            🔗 View on Explorer: {cert.nftMint.slice(0, 8)}...{cert.nftMint.slice(-8)}
+                          </a>
                         </div>
                       )}
                     </div>

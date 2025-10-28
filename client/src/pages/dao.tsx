@@ -129,15 +129,15 @@ export default function DAO() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Всего тестов</p>
-                        <p className="text-2xl font-bold">{userProfile.profile?.totalTests || 0}</p>
+                        <p className="text-2xl font-bold">{userProfile.profile ? userProfile.profile.totalTests : 0}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Пройдено</p>
-                        <p className="text-2xl font-bold text-green-500">{userProfile.profile?.passedTests || 0}</p>
+                        <p className="text-2xl font-bold text-green-500">{userProfile.profile ? userProfile.profile.passedTests : 0}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Заработано</p>
-                        <p className="text-2xl font-bold text-purple-500">{userProfile.profile?.totalEarned.toFixed(3) || '0.000'} SOL</p>
+                        <p className="text-2xl font-bold text-purple-500">{userProfile.profile ? userProfile.profile.totalEarned.toFixed(3) : '0.000'} SOL</p>
                       </div>
                     </div>
                     {userProfile.profile?.skills && userProfile.profile.skills.length > 0 && (
